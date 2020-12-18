@@ -1,2 +1,2 @@
-# arduino-python-u2
-IMPORTANTE: Desarrollado en Python3, se recomienda dicha version para la ejecucion del archivo.
+# Aplicacion Scada con MySQL
+IMPORTANTE: Desarrollado con Python3, se recomienda dicha version para la ejecucion del archivo.
