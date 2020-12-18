@@ -1,4 +1,7 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import pymysql
 import pymysql.cursors
 
@@ -16,7 +19,7 @@ class Pin:
             tmpValue = 1
 
         currentPath = os.path.dirname(os.path.realpath(__file__))
-        os.system("echo {0} > {1}/state/state_arduino_pin_{2}.txt".format(tmpValue, currentPath, num_pin))
+        os.system("echo {0} > {1}/state/arduino_state_pin_{2}.txt".format(tmpValue, currentPath, num_pin))
 
     def recordLog(self, num_pin, value):
         conn = pymysql.connect(host=DB_HOST, user=DB_USER, password=DB_PASSWORD, db=DB_NAME, charset='utf8mb4', cursorclass=pymysql.cursors.DictCursor)
@@ -25,13 +28,15 @@ class Pin:
         currentCursor.execute(query)
         conn.commit()
 
-    def send(self, num_pin, value):
+    def send(self, num_pin, value, record: bool = True):
         tmpval = 0
         if (value % 2 != 0):
             tmpval = 1
 
         self.updateStateTxt(num_pin, value)
-        self.recordLog(num_pin, value)
+        if record:
+            self.recordLog(num_pin, value)
+
         managerArduino.write(str.encode(str(value)))
 
     def createTaskStandard(self, initialHour, initialMinute, finalHour, finalMinute):

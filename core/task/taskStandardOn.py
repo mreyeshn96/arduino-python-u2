@@ -1,10 +1,9 @@
+#!/usr/bin/python3.8
 import os
-os.system("cd /home/reyes/PycharmProjects/PP/task/")
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-if __name__ != "__main__":
-    from core.classPin import *
-else:
-    from ..classPin import *
+from classPin import *
 
 hPin = Pin()
 hPin.send(13, 8)

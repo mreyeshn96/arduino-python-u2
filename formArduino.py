@@ -3,6 +3,8 @@ from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from core.classPin import *
+from formLogin import *
+from formReport import *
 
 import center_tk_window
 
@@ -18,14 +20,18 @@ class FormArduino:
     statePin7 = None
     btnSave = None
     btnClear = None
+    btnReport = None
     imageOn = None
     imageOff = None
     cbMode = None
+    instanceForm = None
+    handlePin = None
 
     def __init__(self, tk):
+        self.instanceForm = tk
         tk.geometry("750x500")
-        tk.title(APP_NAME)
         tk.config()
+        tk.title(APP_NAME)
         center_tk_window.center_on_screen(tk)
         tk.resizable(0,0)
 
@@ -87,11 +93,37 @@ class FormArduino:
         self.btnClear = Button(frame_container__input, text="Limpiar", command=lambda:self.clearInputText())
         self.btnClear.grid(row=5, column=1)
 
+        self.btnReport = Button(frame_container__input, text="Reportes", command=lambda: self.openReport())
+        self.btnReport.grid(row=5, column=2)
+
+        self.btnReport = Button(frame_container__input, text="Apagar", command=lambda: self.OffLed())
+        self.btnReport.grid(row=5, column=3)
+
+        self.handlePin = Pin()
+        self.handlePin.send(13, 8, False)
+        self.handlePin.send(12, 6, False)
+        self.handlePin.send(11, 4, False)
+        self.handlePin.send(8, 2, False)
+        self.handlePin.send(7, 0, False)
+        self.updateForm()
+
+    def OffLed(self):
+        self.handlePin = Pin()
+        self.handlePin.send(13, 8)
+        self.handlePin.send(12, 6)
+        self.handlePin.send(11, 4)
+        self.handlePin.send(8, 2)
+        self.handlePin.send(7, 0)
+
     def clearInputText(self):
         self.txtHI.delete(0, 'end')
         self.txtMI.delete(0, 'end')
         self.txtHF.delete(0, 'end')
         self.txtMF.delete(0, 'end')
+
+    def openReport(self):
+        newWindow = Toplevel()
+        fReport = FormReport(newWindow)
 
     def saveCron(self):
 
@@ -106,6 +138,65 @@ class FormArduino:
         elif self.cbMode.current() == -1:
             messagebox.showerror(title="Informacion requerida", message="Es necesario seleccionar la modalidad.")
         else:
-            handlePin = Pin()
-            handlePin.createTaskStandard(self.txtHI.get(), self.txtMI.get(), self.txtHF.get(), self.txtMF.get())
+
+            if self.cbMode.current() == 0:
+                self.handlePin.createTaskStandard(self.txtHI.get(), self.txtMI.get(), self.txtHF.get(), self.txtMF.get())
+            elif self.cbMode.current() == 1:
+                self.handlePin.createTaskeverse(self.txtHI.get(), self.txtMI.get(), self.txtHF.get(), self.txtMF.get())
+
             self.clearInputText()
+            messagebox.showinfo(title="Tarea guardada", message="Se ha creado con exito el CRON.")
+
+    def updateForm(self):
+        fileStateLed13 = open("core/state/arduino_state_pin_13.txt", "r")
+        fileStateLed12 = open("core/state/arduino_state_pin_12.txt", "r")
+        fileStateLed11 = open("core/state/arduino_state_pin_11.txt", "r")
+        fileStateLed8 = open("core/state/arduino_state_pin_8.txt", "r")
+        fileStateLed7 = open("core/state/arduino_state_pin_7.txt", "r")
+
+        for line in fileStateLed13:
+            field = line.split("\n")
+            statePin = field[0]
+            if int(statePin) == 1:
+                self.statePin13['image'] = self.imageOn
+            else:
+                self.statePin13['image'] = self.imageOff
+        fileStateLed13.close()
+
+        for line in fileStateLed12:
+            field = line.split("\n")
+            statePin = field[0]
+            if int(statePin) == 1:
+                self.statePin12['image'] = self.imageOn
+            else:
+                self.statePin12['image'] = self.imageOff
+        fileStateLed12.close()
+
+        for line in fileStateLed11:
+            field = line.split("\n")
+            statePin = field[0]
+            if int(statePin) == 1:
+                self.statePin11['image'] = self.imageOn
+            else:
+                self.statePin11['image'] = self.imageOff
+        fileStateLed11.close()
+
+        for line in fileStateLed8:
+            field = line.split("\n")
+            statePin = field[0]
+            if int(statePin) == 1:
+                self.statePin8['image'] = self.imageOn
+            else:
+                self.statePin8['image'] = self.imageOff
+        fileStateLed8.close()
+
+        for line in fileStateLed7:
+            field = line.split("\n")
+            statePin = field[0]
+            if int(statePin) == 1:
+                self.statePin7['image'] = self.imageOn
+            else:
+                self.statePin7['image'] = self.imageOff
+        fileStateLed7.close()
+
+        self.instanceForm.after(1000, self.updateForm)

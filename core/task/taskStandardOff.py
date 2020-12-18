@@ -1,5 +1,9 @@
 #!/usr/bin/python3.8
-from core.classPin import Pin
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from classPin import *
 
 hPin = Pin()
 hPin.send(13, 9)
